@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+
+{% block css %}
+<style type="text/css">
+body{
+    padding-top: 40px;
+  }
+  
+.content {
+    width: auto;
+    overflow: hidden;
+}
+
+.c1 {
+    overflow: hidden;
+}
+</style>
+{% endblock %}
+
+
+{% block main %}
+    {% if error %}
+        <p class=error><strong>Error:</strong> {{ error }} </p>
+    {% endif %}
+
+<div class="content">
+    <div class="c1">
+        <h3>{{profile.firstname}} {{profile.lastname}}'s Wishlist</h3>
+        <a href="/addWish/">Add a Wish</a><br><br>
+        <a href="{{ url_for('logout') }}">Logout</a></li>
+    </div>
+</div>
+{% endblock %}

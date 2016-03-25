@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+
+{% block main %}
+    {% if error %}
+        <p class=error><strong>Error:</strong> {{ error }} </p>
+    {% endif %}
+    
+<body>
+    <div class="container">
+        <br><h4>Create Your Wish</h4><br>
+        <form action="{{ url_for('addWish') }}" method="post" name="wish" style="width:25%">
+            <div class="form-group">
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="title">Title</label>
+                    <input id="title" name="title" type="text" class="form-control input-md" value="{{request.form.title}}"><br>
+                    <label class="col-md-4 control-label" for="Post">Description</label>
+                    <textarea class="form-control" id="Post" name="description" value="{{request.form.description}}"></textarea><br>
+                    <label class="col-md-4 control-label" for="url">Reference</label>
+                    <input id="url" name="url" type="text" placeholder="Add Reference URL here if available" class="form-control input-md" value="{{request.form.description_url}}"><br>
+                    <input id="addwish" name="addwish" class="btn btn-primary" type="submit" value="Add Wish" />
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+{% endblock %}

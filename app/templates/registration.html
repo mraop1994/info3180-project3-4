@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+
+{% block js %}
+{% endblock %}
+
+
+{% block main %}
+  {% if error %}
+    <p class=error><strong>Error:</strong> {{ error }} </p>
+  {% endif %}
+  
+<body>
+  <div class="container">
+    <br><h4>Please Register:</h4><br>
+    {% from "_form_helpers.html" import render_field %}
+    <form action="{{ url_for('newprofile') }}" method="post" enctype="multipart/form-data" name="signup" style="width:25%">
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="Firstname" name="firstname" value="{{request.form.firstname}}">
+        <input type="text" class="form-control" placeholder="Lastname" name="lastname" value="{{request.form.lastname}}">
+        <input type="email" class="form-control" placeholder="E-mail Address" name="email" value="{{request.form.email}}">
+        <input type="password" class="form-control" placeholder="Password" name="password" value="{{request.form.password}}">
+        <input type="number" class="form-control" placeholder="Age" name="age" value="{{request.form.age}}">
+        {{render_field(form.sex)}}
+        <br><input class="btn btn-default" type="submit" value="Register">
+      </div>
+    </form>
+  </div>
+</body>
+{% endblock %}

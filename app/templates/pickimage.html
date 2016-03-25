@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+
+{% block main %}
+    {% if error %}
+        <p class=error><strong>Error:</strong> {{ error }} </p>
+    {% endif %}
+    
+<body>
+    <div class="container">
+        <br><h4>Choose an image for your thumbnail</h4><br>
+        {% for image in images %}
+            <a href="/addWish/theimage"><img src="{{image}}" height="100" width="100" name="theimage"/></a>
+        {% endfor %}
+    </div>
+</body>
+{% endblock %}

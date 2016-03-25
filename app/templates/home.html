@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+
+{% block js %}
+{% endblock %}
+
+
+{% block main %}
+  {% if error %}
+    <p class=error><strong>Error:</strong> {{ error }} </p>
+  {% endif %}
+  
+<body>
+  <div class="container">
+    <br><h4>Please Sign In:</h4><br>
+    <form action="{{ url_for('login') }}" class="form-inline" method="post" name="login">
+      <div class="form-group">
+        <input type="email" class="form-control" placeholder="E-mail Address" name="email" value="{{request.form.email}}">
+        <input type="password" class="form-control" placeholder="Password" name="password" value="{{request.form.password}}">
+        <input class="btn btn-default" type="submit" value="Login">
+      </div>
+    </form>
+    <br><h5><a href="{{url_for('newprofile')}}">Sign Up for an account here</a></h5>
+  </div>
+</body>
+{% endblock %}
