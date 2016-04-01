@@ -96,69 +96,46 @@ def wishlist(id):
     profile = myprofile.query.filter_by(userid=id).first()
     profile_vars = {'id':profile.userid, 'email':profile.email, 'age':profile.age, 'firstname':profile.firstname, 'lastname':profile.lastname, 'sex':profile.sex}
     if request.method == 'POST':
-        form = WishForm()
+        title = request.form['title']
+        description = request.form['description']
         url = request.form['url']
-        result = requests.get(url)
-        data = result.text
-        images = []
-        soup = BeautifulSoup(data, 'html.parser')
-        og_image = (soup.find('meta', property='og:image') or soup.find('meta', attrs={'name': 'og:image'}))
-        if og_image and og_image['content']:
-            images.append(og_image['content'])
-        for img in soup.find_all("img", class_="a-dynamic-image"):
-            print img['src']
-            images.append(img['src'])
-        thumbnail_spec = soup.find('link', rel='image_src')
-        if thumbnail_spec and thumbnail_spec['href']:
-            images.append(thumbnail_spec['href'])
-        for img in soup.find_all("img", class_="a-dynamic-image"):
-            if "sprite" not in img["src"]:
-                images.append(img['src'])
-        return render_template('pickimage.html',images=images)
-        
-        # title = request.form['title']
-        # description = request.form['description']
-        # url = request.form['url']
-        # return redirect(url_for('getPics'))
-    #     newWish = mywish(userid=userid, title=title, description=description, description_url=description_url)
-    #     db.session.add(newWish)
-    #     db.session.commit()
-    #     profilefilter = myprofile.query.filter_by(userid=newWish.userid).first()
-    #     return redirect('/profile/'+str(profilefilter.userid))
+        newWish = mywish(userid=id, title=title, description=description, description_url=url)
+        db.session.add(newWish)
+        db.session.commit()
+        profilefilter = mywish.query.filter_by(wishid=newWish.wishid).first()
+        return redirect(url_for('getPics',wishid=profilefilter.wishid))
     form = WishForm()
     return render_template('addWish.html',form=form,profile=profile_vars)
+
     
-    
-# @app.route('/getPics', methods = ['POST','GET'])
-# def getPics():
-#     form = WishForm()
-#     url = request.form['url']
-#     result = requests.get(url)
-#     data = result.text
-#     soup = BeautifulSoup(data, 'html.parser')
-#     og_image = (soup.find('meta', property='og:image') or
-#                         soup.find('meta', attrs={'name': 'og:image'}))
-#     if og_image and og_image['content']:
-#         print og_image['content']
-    
-#     thumbnail_spec = soup.find('link', rel='image_src')
-#     if thumbnail_spec and thumbnail_spec['href']:
-#         print thumbnail_spec['href']
-    
-#     def image_dem():
-#         image = """<img src="%s"><br />"""
-#         for img in soup.find_all("img", class_="a-dynamic-image"): #soup.findAll("img", src=True):
-#           if "sprite" not in img["src"]:
-#               print image % urlparse.urljoin(url, img["src"])
-#               print img['src']
-#     image_dem()
-#     return redirect('/profile/')
+@app.route('/api/thumbnail/process/<wishid>')
+@login_required
+def getPics(wishid):
+    profilefilter = mywish.query.filter_by(wishid=wishid).first()
+    url = profilefilter.description_url
+    result = requests.get(url)
+    data = result.text
+    images = []
+    soup = BeautifulSoup(data, 'html.parser')
+    og_image = (soup.find('meta', property='og:image') or soup.find('meta', attrs={'name': 'og:image'}))
+    if og_image and og_image['content']:
+        images.append(og_image['content'])
+    for img in soup.find_all("img", class_="a-dynamic-image"):
+        print img['src']
+        images.append(img['src'])
+    thumbnail_spec = soup.find('link', rel='image_src')
+    if thumbnail_spec and thumbnail_spec['href']:
+        images.append(thumbnail_spec['href'])
+    for img in soup.find_all("img", class_="a-dynamic-image"):
+        if "sprite" not in img["src"]:
+            images.append(img['src'])
+    return render_template('pickimage.html',images=images)
 
 
-@app.route('/addWish/<theimage>', methods = ['POST','GET'])
-def popDBwish(theimage):
-    print theimage['1']
-    return render_template(url_for('/'))
+# @app.route('/addWish/<theimage>', methods = ['POST','GET'])
+# def popDBwish(theimage):
+#     print theimage['1']
+#     return render_template(url_for('/'))
 
 
 @app.route('/about/')
