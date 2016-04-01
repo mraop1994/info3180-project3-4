@@ -1,4 +1,4 @@
-import os, time, datetime, json, requests, urlparse, urllib2
+import os, time, datetime, json, requests, urlparse
 from app import app, db
 from flask import render_template, request, redirect, url_for, jsonify, g, session, flash
 from flask.ext.login import LoginManager, login_user , logout_user , current_user , login_required
@@ -34,7 +34,7 @@ def home():
     return render_template('home.html')
     
 
-@app.route('/login', methods=['POST','GET'])
+@app.route('/api/user/login', methods=['POST','GET'])
 def login():
     error=None
     form = LoginForm(request.form)
@@ -48,7 +48,7 @@ def login():
         if attempted_email == db_email and attempted_password == db_password:
             session['logged_in'] = True
             login_user(db_creds)
-            return redirect('/profile/'+str(db_id))
+            return redirect('/api/user/'+str(db_id))
         else:
             error = 'Invalid credentials'
             return render_template("home.html",error=error,form=form)
@@ -63,7 +63,7 @@ def logout():
     return redirect('/')
 
 
-@app.route('/profile/', methods = ['POST','GET'])
+@app.route('/api/user/register', methods = ['POST','GET'])
 def newprofile():
     if request.method == 'POST':
         form = ProfileForm()
@@ -77,12 +77,12 @@ def newprofile():
         db.session.add(newProfile)
         db.session.commit()
         profilefilter = myprofile.query.filter_by(email=newProfile.email).first()
-        return redirect('/profile/'+str(profilefilter.userid))
+        return redirect('/api/user/'+str(profilefilter.userid))
     form = ProfileForm()
     return render_template('registration.html',form=form)
 
 
-@app.route('/profile/<userid>')
+@app.route('/api/user/<userid>')
 @login_required
 def profile_view(userid):
     if g.user.is_authenticated:
@@ -90,10 +90,11 @@ def profile_view(userid):
         return render_template('profile_view.html',profile=profile_vars)
     
 
-@app.route('/addWish/', methods = ['POST','GET'])
-def addWish():
-    # profile = myprofile.query.filter_by(userid=userid).first()
-    # profile_vars = {'id':profile.userid, 'email':profile.email, 'age':profile.age, 'firstname':profile.firstname, 'lastname':profile.lastname, 'sex':profile.sex}
+@app.route('/api/user/<id>/wishlist', methods = ['POST','GET'])
+@login_required
+def wishlist(id):
+    profile = myprofile.query.filter_by(userid=id).first()
+    profile_vars = {'id':profile.userid, 'email':profile.email, 'age':profile.age, 'firstname':profile.firstname, 'lastname':profile.lastname, 'sex':profile.sex}
     if request.method == 'POST':
         form = WishForm()
         url = request.form['url']
@@ -110,16 +111,10 @@ def addWish():
         thumbnail_spec = soup.find('link', rel='image_src')
         if thumbnail_spec and thumbnail_spec['href']:
             images.append(thumbnail_spec['href'])
+        for img in soup.find_all("img", class_="a-dynamic-image"):
+            if "sprite" not in img["src"]:
+                images.append(img['src'])
         return render_template('pickimage.html',images=images)
-        
-        # def image_dem():
-        #     image = """<img src="%s"><br />"""
-        #     for img in soup.find_all("img", class_="a-dynamic-image"):
-        #       if "sprite" not in img["src"]:
-        #           print image % urlparse.urljoin(url, img["src"])
-        #           print img['src']
-        # image_dem()
-        
         
         # title = request.form['title']
         # description = request.form['description']
@@ -131,7 +126,7 @@ def addWish():
     #     profilefilter = myprofile.query.filter_by(userid=newWish.userid).first()
     #     return redirect('/profile/'+str(profilefilter.userid))
     form = WishForm()
-    return render_template('addWish.html',form=form)
+    return render_template('addWish.html',form=form,profile=profile_vars)
     
     
 # @app.route('/getPics', methods = ['POST','GET'])
