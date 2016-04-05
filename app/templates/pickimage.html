@@ -1,6 +1,21 @@
 {% extends "base.html" %}
 
 
+{% block js %}
+<script>
+    var addImage = function() {
+        var url = document.getElementById("myImg").src;
+        var wishid = '{{wish.wishid}}';
+        var pg = require('pg');
+        var connectionString = "postgresql://postgres:postgres@localhost/project3_4";
+        var pgClient = new pg.Client(connectionString);
+        pgClient.connect();
+        pgClient.query("INSERT INTO mywish(thumbnail_url) VALUES ($1) where wishid = $2",[url,wishid]);
+    };
+</script>
+{% endblock %}
+
+
 {% block main %}
     {% if error %}
         <p class=error><strong>Error:</strong> {{ error }} </p>
@@ -10,7 +25,7 @@
     <div class="container">
         <br><h4>Choose an image for your thumbnail</h4><br>
         {% for image in images %}
-            <a href="/addWish/theimage"><img src="{{image}}" height="100" width="100" name="theimage"/></a>
+            <a href="/api/user/{{wish.userid}}" onclick="addImage()"><img src="{{image}}" height="100" width="100" name="theimage" id="myImg"/></a>
         {% endfor %}
     </div>
 </body>

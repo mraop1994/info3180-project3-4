@@ -111,8 +111,9 @@ def wishlist(id):
 @app.route('/api/thumbnail/process/<wishid>')
 @login_required
 def getPics(wishid):
-    profilefilter = mywish.query.filter_by(wishid=wishid).first()
-    url = profilefilter.description_url
+    wish = mywish.query.filter_by(wishid=wishid).first()
+    profile_vars = {'wishid':wish.wishid, 'userid':wish.userid, 'title':wish.title, 'desc':wish.description, 'descurl':wish.description_url, 'thumbs':wish.thumbnail_url}
+    url = wish.description_url
     result = requests.get(url)
     data = result.text
     images = []
@@ -129,7 +130,7 @@ def getPics(wishid):
     for img in soup.find_all("img", class_="a-dynamic-image"):
         if "sprite" not in img["src"]:
             images.append(img['src'])
-    return render_template('pickimage.html',images=images)
+    return render_template('pickimage.html',images=images,wish=profile_vars)
 
 
 # @app.route('/addWish/<theimage>', methods = ['POST','GET'])

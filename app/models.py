@@ -44,6 +44,7 @@ class mywish(db.Model):
     title = db.Column(db.String(100))
     description = db.Column(db.String(500))
     description_url = db.Column(db.String(500))
+    thumbnail_url = db.Column(db.String(500))
     
     
     def __init__(self, userid, title, description, description_url):
