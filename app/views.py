@@ -7,6 +7,7 @@ from app.forms import LoginForm, ProfileForm, WishForm
 from werkzeug.utils import secure_filename
 from functools import wraps
 from bs4 import BeautifulSoup
+import simplejson as json
 
 
 app.secret_key = 'why would I tell you my secret key?'
@@ -31,6 +32,8 @@ def before_request():
 @app.route('/')
 def home():
     """Render website's home page."""
+    if g.user.is_authenticated:
+        return redirect('/api/user/' + str(g.user.userid))
     return render_template('home.html')
     
 
@@ -48,6 +51,7 @@ def login():
         if attempted_email == db_email and attempted_password == db_password:
             session['logged_in'] = True
             login_user(db_creds)
+            flash("yes dawg, it wuk!")
             return redirect('/api/user/'+str(db_id))
         else:
             error = 'Invalid credentials'
@@ -59,27 +63,28 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
-    session['logged_in'] = False
     return redirect('/')
 
 
 @app.route('/api/user/register', methods = ['POST','GET'])
 def newprofile():
-    if request.method == 'POST':
-        form = ProfileForm()
-        firstname = request.form['firstname']
-        lastname = request.form['lastname']
-        sex = request.form['sex']
-        age = int(request.form['age'])
-        email = request.form['email']
-        password = request.form['password']
-        newProfile = myprofile(firstname=firstname, lastname=lastname, email=email, password=password, sex=sex, age=age)
-        db.session.add(newProfile)
-        db.session.commit()
-        profilefilter = myprofile.query.filter_by(email=newProfile.email).first()
-        return redirect('/api/user/'+str(profilefilter.userid))
+    error=None
     form = ProfileForm()
-    return render_template('registration.html',form=form)
+    if session['logged_in'] == False:
+        if request.method == 'POST':
+            firstname = request.form['firstname']
+            lastname = request.form['lastname']
+            sex = request.form['sex']
+            age = int(request.form['age'])
+            email = request.form['email']
+            password = request.form['password']
+            newProfile = myprofile(firstname=firstname, lastname=lastname, email=email, password=password, sex=sex, age=age)
+            db.session.add(newProfile)
+            db.session.commit()
+            return redirect('/api/user/'+str(newProfile.userid))
+        form = ProfileForm()
+        return render_template('registration.html',form=form)
+    return redirect('/')
 
 
 @app.route('/api/user/<userid>')
@@ -102,8 +107,7 @@ def wishlist(id):
         newWish = mywish(userid=id, title=title, description=description, description_url=url)
         db.session.add(newWish)
         db.session.commit()
-        profilefilter = mywish.query.filter_by(wishid=newWish.wishid).first()
-        return redirect(url_for('getPics',wishid=profilefilter.wishid))
+        return redirect(url_for('getPics',wishid=newWish.wishid))
     form = WishForm()
     return render_template('addWish.html',form=form,profile=profile_vars)
 
@@ -112,7 +116,7 @@ def wishlist(id):
 @login_required
 def getPics(wishid):
     wish = mywish.query.filter_by(wishid=wishid).first()
-    profile_vars = {'wishid':wish.wishid, 'userid':wish.userid, 'title':wish.title, 'desc':wish.description, 'descurl':wish.description_url, 'thumbs':wish.thumbnail_url}
+    wish_vars = {'wishid':wish.wishid, 'userid':wish.userid, 'title':wish.title, 'desc':wish.description, 'descurl':wish.description_url, 'thumbs':wish.thumbnail_url}
     url = wish.description_url
     result = requests.get(url)
     data = result.text
@@ -130,13 +134,18 @@ def getPics(wishid):
     for img in soup.find_all("img", class_="a-dynamic-image"):
         if "sprite" not in img["src"]:
             images.append(img['src'])
-    return render_template('pickimage.html',images=images,wish=profile_vars)
+    return render_template('pickimage.html',images=images,wish=wish_vars)
 
 
-# @app.route('/addWish/<theimage>', methods = ['POST','GET'])
-# def popDBwish(theimage):
-#     print theimage['1']
-#     return render_template(url_for('/'))
+@app.route('/addpic/<wishid>/<id>', methods=['POST'])
+@login_required
+def wishpic(wishid, id):
+    profile = myprofile.query.filter_by(userid=id).first()
+    profile_vars = {'id':profile.userid, 'email':profile.email, 'age':profile.age, 'firstname':profile.firstname, 'lastname':profile.lastname, 'sex':profile.sex}
+    user = mywish.query.get(wishid)
+    user.thumbnail_url = request.json['thumbs']
+    db.session.commit()
+    return render_template('profile_view.html',profile=profile_vars)
 
 
 @app.route('/about/')

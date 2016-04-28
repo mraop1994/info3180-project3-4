@@ -25,6 +25,16 @@ body{
     {% endif %}
 
 <div class="content">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success alert-dismissable" style="width:98%;">
+          <a class="" href="javascript:void(0);">×</a>
+            {{message}}
+        </div>
+      {% endfor %}
+    {% endif %}
+    {% endwith %}
     <div class="c1">
         <h3>{{profile.firstname}} {{profile.lastname}}'s Wishlist</h3>
         <a href="/api/user/{{profile.id}}/wishlist">Add a Wish</a><br><br>

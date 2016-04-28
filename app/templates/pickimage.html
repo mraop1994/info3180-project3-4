@@ -2,16 +2,19 @@
 
 
 {% block js %}
-<script>
-    var addImage = function() {
-        var url = document.getElementById("myImg").src;
-        var wishid = '{{wish.wishid}}';
-        var pg = require('pg');
-        var connectionString = "postgresql://postgres:postgres@localhost/project3_4";
-        var pgClient = new pg.Client(connectionString);
-        pgClient.connect();
-        pgClient.query("INSERT INTO mywish(thumbnail_url) VALUES ($1) where wishid = $2",[url,wishid]);
-    };
+<script type="text/javascript">
+    function addImage(_src) {
+        $.ajax({
+            url:"/addpic/{{wish.wishid}}/{{wish.userid}}",
+            type: "POST",
+            contentType:"application/json",
+            dataType:"json",
+            data: JSON.stringify({'thumbs':_src})
+        }).always(function () {
+            var url = "/api/user/{{wish.userid}}";
+            $(location).attr('href', url);
+        });
+    }
 </script>
 {% endblock %}
 
@@ -20,12 +23,12 @@
     {% if error %}
         <p class=error><strong>Error:</strong> {{ error }} </p>
     {% endif %}
-    
+
 <body>
     <div class="container">
         <br><h4>Choose an image for your thumbnail</h4><br>
         {% for image in images %}
-            <a href="/api/user/{{wish.userid}}" onclick="addImage()"><img src="{{image}}" height="100" width="100" name="theimage" id="myImg"/></a>
+            <img class="clickt" onclick="addImage(this.src)" src="{{image}}" height="100" width="100" name="theimage"/>
         {% endfor %}
     </div>
 </body>
