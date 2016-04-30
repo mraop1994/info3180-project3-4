@@ -3,8 +3,9 @@ from app import app, db
 from flask import render_template, request, redirect, url_for, jsonify, g, session, flash
 from flask.ext.login import LoginManager, login_user, logout_user, current_user, login_required
 from app.models import myprofile, mywish
-from app.forms import LoginForm, ProfileForm, WishForm
+from app.forms import LoginForm, ProfileForm, WishForm, ShareForm
 from bs4 import BeautifulSoup
+from app.email import send_email, mail
 
 
 lm = LoginManager()
@@ -62,26 +63,24 @@ def logout():
 @app.route('/api/user/register', methods = ['POST','GET'])
 def newprofile():
     error=None
-    if session['logged_in']:
-        form = ProfileForm()
-        if request.method == 'POST':
-            firstname = request.form['firstname']
-            lastname = request.form['lastname']
-            sex = request.form['sex']
-            age = int(request.form['age'])
-            email = request.form['email']
-            password = request.form['password']
-            salt = uuid.uuid4().hex
-            salty = hashlib.sha256(salt.encode() + password.encode()).hexdigest() + ':' + salt
-            hash_object = hashlib.sha256(email + salty)
-            hashed = hash_object.hexdigest()
-            newProfile = myprofile(firstname=firstname, lastname=lastname, email=email, password=password, sex=sex, age=age, hashed=hashed)
-            db.session.add(newProfile)
-            db.session.commit()
-            return redirect('/')
-        form = ProfileForm()
-        return render_template('registration.html',form=form,error=error)
-    return redirect('/')
+    form = ProfileForm()
+    if request.method == 'POST':
+        firstname = request.form['firstname']
+        lastname = request.form['lastname']
+        sex = request.form['sex']
+        age = int(request.form['age'])
+        email = request.form['email']
+        password = request.form['password']
+        salt = uuid.uuid4().hex
+        salty = hashlib.sha256(salt.encode() + password.encode()).hexdigest() + ':' + salt
+        hash_object = hashlib.sha256(email + salty)
+        hashed = hash_object.hexdigest()
+        newProfile = myprofile(firstname=firstname, lastname=lastname, email=email, password=password, sex=sex, age=age, hashed=hashed)
+        db.session.add(newProfile)
+        db.session.commit()
+        return redirect('/')
+    form = ProfileForm()
+    return render_template('registration.html',form=form,error=error)
 
 
 @app.route('/api/user/<userid>')
@@ -156,9 +155,17 @@ def wishpic(wishid):
     return redirect('/api/user/' + str(g.user.hashed) + '/wishlist')
 
 
-@app.route('/api/user/sharing')
+@app.route('/api/user/sharing', methods=['POST', 'GET'])
 def sharing():
-    return render_template('sharing.html')
+    form = ShareForm()
+    if request.method == 'POST':
+        email = request.form['email']
+        # confirm_url = "http://www.tv.com/"
+        # html = render_template('profile_views.html', confirm_url=confirm_url)
+        subject = "Please see my wishlist"
+        send_email(email, subject)
+        return redirect("/")
+    return render_template('sharing.html', form=form)
     
 
 @app.route('/about/')

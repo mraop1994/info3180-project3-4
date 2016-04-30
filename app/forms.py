@@ -21,3 +21,7 @@ class WishForm(Form):
     title = TextField('Title')
     description = TextField('Description')
     description_url = TextField('Reference')
+    
+
+class ShareForm(Form):
+    email = TextField('Email Address', validators=[Length(min=6, max=100), Required("Required"), Email()])
