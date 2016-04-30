@@ -6,9 +6,7 @@ Flask-WTF
 Flask-SQLAlchemy
 Flask-Migrate
 Flask-Login
-Flask-RESTful
 Flask-Script
-flask-cors
 
 
 # ----------------------
@@ -30,9 +28,4 @@ argparse
 beautifulsoup4
 requests
 wsgiref
-autopep8
-marshmallow
-pep8
 psycopg2
-PyJWT
-uWSGI
