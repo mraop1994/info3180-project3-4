@@ -6,8 +6,10 @@ Flask-WTF
 Flask-SQLAlchemy
 Flask-Migrate
 Flask-Login
-Flask-OpenId
-psycopg2
+Flask-RESTful
+Flask-Script
+flask-cors
+
 
 # ----------------------
 # Testing
@@ -20,10 +22,17 @@ mock
 # ----------------------
 gunicorn
 
+
 # ----------------------
-# Remember to give this a name
+# Extra Stuff
 # ----------------------
-argparse==1.2.1
-beautifulsoup4==4.4.1
-requests==2.9.1
-wsgiref==0.1.2
+argparse
+beautifulsoup4
+requests
+wsgiref
+autopep8
+marshmallow
+pep8
+psycopg2
+PyJWT
+uWSGI

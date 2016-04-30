@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <br><h4>Create Your Wish</h4><br>
-        <form action="{{ url_for('wishlist', id=profile.id) }}" method="post" name="wish" style="width:25%">
+        <form action="{{ url_for('wishlist', id=profile.hashed) }}" method="post" name="wish" style="width:25%">
             <div class="form-group">
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="title">Title</label>

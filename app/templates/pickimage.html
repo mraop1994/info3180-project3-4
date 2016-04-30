@@ -5,13 +5,13 @@
 <script type="text/javascript">
     function addImage(_src) {
         $.ajax({
-            url:"/addpic/{{wish.wishid}}/{{wish.userid}}",
+            url:"/addpic/{{wish.wishid}}",
             type: "POST",
             contentType:"application/json",
             dataType:"json",
             data: JSON.stringify({'thumbs':_src})
         }).always(function () {
-            var url = "/api/user/{{wish.userid}}";
+            var url = "/api/user/{{profile.hashed}}/wishlist";
             $(location).attr('href', url);
         });
     }

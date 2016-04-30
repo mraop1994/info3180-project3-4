@@ -28,17 +28,29 @@ body{
     {% with messages = get_flashed_messages() %}
     {% if messages %}
       {% for message in messages %}
-        <div class="alert alert-success alert-dismissable" style="width:98%;">
-          <a class="" href="javascript:void(0);">×</a>
-            {{message}}
-        </div>
+        {{message}}
       {% endfor %}
     {% endif %}
     {% endwith %}
     <div class="c1">
         <h3>{{profile.firstname}} {{profile.lastname}}'s Wishlist</h3>
-        <a href="/api/user/{{profile.id}}/wishlist">Add a Wish</a><br><br>
+        <form action="{{ url_for('profile_view',userid=profile.id) }}" method="get">
+            <input class="btn btn-default" type="submit" value="Add a Wish">
+        </form>
         <a href="{{ url_for('logout') }}">Logout</a></li>
     </div>
+    <table>
+        {% for wishes in wish %}
+            <tr>
+                <td>
+                    <a href="{{wishes.descurl}}" target="_blank"><img src="{{wishes.thumbs}}" height="100" width="100"></a>
+                </td>
+                <td>
+                    <p>Title: {{wishes.title}}</p>
+                    <p>Description: {{wishes.desc}}</p>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
 </div>
 {% endblock %}

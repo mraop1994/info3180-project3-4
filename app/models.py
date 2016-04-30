@@ -1,4 +1,6 @@
-from . import db  
+from . import db
+
+
 class myprofile(db.Model):
     userid = db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(80))
@@ -7,19 +9,33 @@ class myprofile(db.Model):
     password = db.Column(db.String(100))
     age = db.Column(db.Integer)
     sex = db.Column(db.String(8))
+    hashed = db.Column(db.String(300))
     
     
-    def __init__(self, firstname, lastname, email, password, age, sex):
+    def __init__(self, firstname, lastname, email, password, age, sex, hashed):
         self.firstname = firstname
         self.lastname = lastname
         self.email = email
         self.password = password
         self.age = age
         self.sex = sex
+        self.hashed = hashed
     
     
     def is_authenticated(self):
         return True
+    
+    
+    def add(self, resource):
+        db.session.add(resource)
+        return db.session.commit()
+
+    def update(self):
+        return db.session.commit()
+
+    def delete(self, resource):
+        db.session.delete(resource)
+        return db.session.commit()
         
         
     def is_active(self):
@@ -36,7 +52,7 @@ class myprofile(db.Model):
         
     def __repr__(self):
         return '<User %r>' % self.userid
-
+        
 
 class mywish(db.Model):
     wishid = db.Column(db.Integer, primary_key=True)
