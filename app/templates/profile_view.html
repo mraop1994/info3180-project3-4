@@ -34,11 +34,19 @@ body{
     {% endwith %}
     <div class="c1">
         <h3>{{profile.firstname}} {{profile.lastname}}'s Wishlist</h3>
-        <form action="{{ url_for('profile_view',userid=profile.id) }}" method="get">
-            <input class="btn btn-default" type="submit" value="Add a Wish">
-        </form>
-        <a href="{{ url_for('logout') }}">Logout</a></li>
+        <div class="form-inline">
+            <form action="{{ url_for('profile_view',userid=profile.id) }}" class="form-control" method="get">
+                <input class="btn btn-default" type="submit" value="Add a Wish">
+            </form>
+            <form action="{{ url_for('logout') }}" class="form-control" method="get">
+                <input class="btn btn-default" type="submit" value="Logout">
+            </form>
+            <form action="{{ url_for('logout') }}" class="form-control" method="get">
+                <input class="btn btn-default" type="submit" value="Share wishlist with a friend">
+            </form>
+        </div>
     </div>
+    <hr/>
     <table>
         {% for wishes in wish %}
             <tr>
