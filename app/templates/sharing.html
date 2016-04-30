@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+
+{% block js %}
+{% endblock %}
+
+
+{% block main %}
+  {% if error %}
+    <p class=error><strong>Error:</strong> {{ error }} </p>
+  {% endif %}
+  
+<body>
+  <div class="container">
+    <br><h4>Please Register:</h4><br>
+    {% from "_form_helpers.html" import render_field %}
+    <form action="{{ url_for('sharing') }}" method="post" enctype="multipart/form-data" name="share" style="width:25%">
+      <div class="form-group">
+        <input type="email" class="form-control" placeholder="E-mail Address" name="email" value="{{request.form.email}}">
+        <br><input class="btn btn-default" type="submit" value="Share Wishlist">
+      </div>
+    </form>
+  </div>
+</body>
+{% endblock %}
